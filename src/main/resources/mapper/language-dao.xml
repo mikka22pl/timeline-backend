@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.LanguageDao">
+	
+	<resultMap id="languageMap" type="Language">
+		<id     property="id"       column="id" />
+		<result property="name" 	column="language" />
+	</resultMap>
+	
+	<select id="getLanguage" resultMap="languageMap">
+		SELECT id, language FROM languages
+	</select>
+	
+</mapper>
