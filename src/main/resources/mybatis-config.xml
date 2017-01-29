@@ -8,5 +8,8 @@
     </typeAliases>
     <mappers>
         <mapper resource="mapper/language-dao.xml"/>
+        <mapper resource="mapper/tag-dao.xml"/>
+        <mapper resource="mapper/category-dao.xml"/>
+        <mapper resource="mapper/article-dao.xml"/>
     </mappers>
 </configuration>

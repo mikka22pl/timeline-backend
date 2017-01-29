@@ -9,11 +9,15 @@ public class NamedEntity extends BaseEntity
 	private String descr;
 	
 	public NamedEntity() {
-		this(null);
+		this(null, null);
 	}
 	
 	public NamedEntity(Integer id) {
 		this(id, null);
+	}
+	
+	public NamedEntity(String name) {
+		this(null, name);
 	}
 	
 	public NamedEntity(Integer id, String name) {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.CategoryDao">
+	
+	<resultMap id="categoryMap" type="Category">
+		<id     property="id"       column="cat_id" />
+		<result property="name" 	column="category" />
+	</resultMap>
+	
+	<select id="getCategory" resultMap="categoryMap">
+		SELECT 
+			c.id as cat_id, 
+			c.category
+		FROM categories c
+		<trim prefix="WHERE" prefixOverrides="AND ">
+			<if test="id != null">   AND c.id = #{id} </if>
+			<if test="name != null"> AND LOWER(c.category) = LOWER(#{name}) </if>
+		</trim>
+	</select>
+	
+	<insert id="addCategory" parameterType="Category">
+		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
+			SELECT currval('categories_id_seq') as id
+		</selectKey>
+		INSERT INTO categories (category)
+		VALUES (#{name})
+	</insert>
+	
+</mapper>

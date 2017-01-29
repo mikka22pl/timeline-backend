@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.TagDao">
+	
+	<resultMap id="tagMap" type="Tag">
+		<id     property="id"       column="tag_id" />
+		<result property="name" 	column="tag" />
+		
+		<association property="language" resultMap="org.ulv.timeline.dao.LanguageDao.languageMap" />
+	</resultMap>
+	
+	<sql id="tagSelect">
+		SELECT 
+			t.id as tag_id, 
+			t.tag,
+			l.id as language_id,
+			l.language
+		FROM tags t
+		JOIN languages l ON l.id = t.language_id
+	</sql>
+	
+	<select id="getTag" resultMap="tagMap">
+		<include refid="tagSelect" />
+	</select>
+	
+	<select id="getTagByName" resultMap="tagMap" parameterType="string">
+		<include refid="tagSelect" />
+		WHERE LOWER(t.tag) = LOWER(#{value})
+	</select>
+	
+	<insert id="addTag" parameterType="Tag">
+		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
+			SELECT currval('tags_id_seq') as id
+		</selectKey>
+		INSERT INTO tags (tag, language_id)
+		VALUES (#{name}, 1)
+	</insert>
+	
+</mapper>
