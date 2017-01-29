@@ -3,12 +3,12 @@
 <mapper namespace="org.ulv.timeline.dao.LanguageDao">
 	
 	<resultMap id="languageMap" type="Language">
-		<id     property="id"       column="id" />
+		<id     property="id"       column="language_id" />
 		<result property="name" 	column="language" />
 	</resultMap>
 	
 	<select id="getLanguage" resultMap="languageMap">
-		SELECT id, language FROM languages
+		SELECT l.id as language_id, l.language FROM languages l
 	</select>
 	
 </mapper>

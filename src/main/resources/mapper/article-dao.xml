@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.ArticleDao">
+	
+	<resultMap id="articleMap" type="Article">
+		<id     property="id"       column="a_id" />
+		<result property="name" 	column="title" />
+		<result property="descr" 	column="descr" />
+		<result property="link" 	column="link" />
+		<result property="onDate" 	column="on_date" />
+		
+		<association property="category" resultMap="org.ulv.timeline.dao.CategoryDao.categoryMap" />
+		
+		<collection property="tags" ofType="Tag" resultMap="org.ulv.timeline.dao.TagDao.tagMap" />
+	</resultMap>
+	
+	<sql id="selectArticle">
+		SELECT 
+			a.id as a_id,
+			a.title,
+			a.descr,
+			a.link,
+			a.on_date,
+			a.created_date,
+			c.id as cat_id,
+			c.category,
+			t.id as tag_id,
+			t.tag
+		FROM articles a
+		JOIN categories c ON c.id = a.category_id
+		JOIN article_tags at ON at.article_id = a.id
+		JOIN tags t ON t.id = at.tag_id
+	</sql>
+	<sql id="orderByDate">
+		ORDER BY a.on_date ASC
+	</sql>
+	
+	<select id="getArticle" resultMap="articleMap">
+		<include refid="selectArticle" />
+		<trim prefix="WHERE" prefixOverrides="AND ">
+			<if test="id != null"> AND a.id = #{id}</if>
+		</trim>
+		<include refid="orderByDate" />
+	</select>
+	
+	<select id="getArticleByTagId" resultMap="articleMap">
+		<include refid="selectArticle" />
+		<trim prefix="WHERE" prefixOverrides="AND ">
+			<if test="value != null"> AND t.id = #{value}</if>
+		</trim>
+		<include refid="orderByDate" />
+	</select>
+	
+	<insert id="addArticle" parameterType="Article">
+		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
+			SELECT currval('articles_id_seq') as id
+		</selectKey>
+		INSERT INTO articles (title, descr, link, category_id, on_date)
+		VALUES (#{name}, #{descr}, #{link}, #{category.id}, #{onDate})
+	</insert>
+	
+	<insert id="assignTags" parameterType="Article">
+		INSERT INTO article_tags 
+		VALUES <foreach collection="tags" item="tag" separator=",">(#{id}, #{tag.id})</foreach>
+	</insert>
+	
+</mapper>
