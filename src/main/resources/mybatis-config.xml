@@ -5,11 +5,14 @@
 <configuration>
     <typeAliases>
         <package name="org.ulv.timeline.model"/>
+        <package name="org.ulv.rss.model"/>
     </typeAliases>
     <mappers>
         <mapper resource="mapper/language-dao.xml"/>
         <mapper resource="mapper/tag-dao.xml"/>
         <mapper resource="mapper/category-dao.xml"/>
         <mapper resource="mapper/article-dao.xml"/>
+        <mapper resource="mapper/rssfeed-dao.xml"/>
+        <mapper resource="mapper/rssentry-dao.xml"/>
     </mappers>
 </configuration>

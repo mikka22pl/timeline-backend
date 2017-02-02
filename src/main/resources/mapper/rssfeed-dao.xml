@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.RssFeedDao">
+	
+	<resultMap id="feedMap" type="RssFeed">
+		<id     property="id"       column="rss_id" />
+		<result property="name" 	column="rss_distributor" />
+		<result property="url" 		column="rss_feed_url" />
+		<result property="category" column="rss_category_name" />
+		<result property="createdDate" column="rss_created_date" />
+	</resultMap>
+	
+	<sql id="feedColumns">
+		f.id as rss_id, 
+		f.distributor as rss_distributor,
+		f.feed_url as rss_feed_url,
+		f.category_name as rss_category_name,
+		f.created_date as rss_created_date
+	</sql>
+	
+	<sql id="feedSelect">
+		SELECT 
+		<include refid="feedColumns" />
+		FROM rssfeeds f
+	</sql>
+	
+	<select id="getRssFeed" parameterType="integer" resultMap="feedMap">
+		<include refid="feedSelect" />
+		<trim prefix="WHERE">
+			<if test="value != null"> f.id = #{value}</if>
+		</trim>
+	</select>
+	
+	
+	<insert id="addRssFeed" parameterType="RssFeed">
+		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
+			SELECT currval('rssfeeds_id_seq') as id
+		</selectKey>
+		INSERT INTO rssfeeds (feed_url, distributor, category_name)
+		VALUES (#{url}, #{name}, #{category})
+	</insert>
+	
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.RssEntryDao">
+	
+	<resultMap id="rssEntryMap" type="RssEntry">
+		<result property="link"         column="ey_link" />
+		<result property="title" 	    column="ey_title" />
+		<result property="descr" 		column="ey_lead_content" />
+		<result property="pubDate" 	    column="ey_pub_date" />
+		<result property="done" 	    column="ey_done" />
+		<result property="doneDate" 	column="ey_done_date" />
+		<result property="createdDate"  column="ey_created_date" />
+		
+		<association property="rssFeed" javaType="RssFeed" 
+			resultMap="org.ulv.timeline.dao.RssFeedDao.feedMap" />
+	</resultMap>
+	
+	<sql id="draftEntrySelect">
+		SELECT 
+			de.link 		as ey_link, 
+			de.title 		as ey_title,
+			de.lead_content as ey_lead_content,
+			de.pub_date 	as ey_pub_date,
+			de.done 		as ey_done,
+			de.done_date 	as ey_done_date,
+			de.created_date as ey_created_date,
+			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />
+		FROM rss_draft_entries de
+		JOIN rssfeeds f ON f.id = de.rssfeed_id
+	</sql>
+	
+	<select id="getRssEntry" parameterType="RssEntry" resultMap="rssEntryMap">
+		<include refid="draftEntrySelect" />
+		<trim prefix="WHERE">
+			<if test="rssFeed.id != null"> de.rssfeed_id = #{rssFeed.id}</if>
+		</trim>
+	</select>
+	
+	
+	<insert id="addDraftEntry" parameterType="RssEntry">
+		INSERT INTO rss_draft_entries (link, title, lead_content, pub_date, rssfeed_id)
+		VALUES (#{link}, #{title}, #{descr}, #{pubDate}, #{rssFeed.id})
+	</insert>
+	
+	
+	<update id="doneDraftEntry" parameterType="RssEntry">
+		UPDATE rss_draft_entries SET 
+			done = 't',
+			done_date = now()
+		WHERE link = #{link}
+	</update>
+	
+	<insert id="acceptDraftEntry" parameterType="RssEntry">
+		INSERT INTO rss_entries (link, title, lead_content, pub_date, rssfeed_id, feed_date)
+		VALUES (#{link}, #{title}, #{descr}, #{pubDate}, #{rssFeed.id}, now())
+	</insert>
+</mapper>

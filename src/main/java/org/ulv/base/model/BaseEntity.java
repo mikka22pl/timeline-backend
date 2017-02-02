@@ -1,11 +1,11 @@
-package org.ulv.timeline.model;
+package org.ulv.base.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
 public abstract class BaseEntity implements Serializable {
 
-	private static final long serialVersionUID = -8372934197600765565L;
+	private static final long serialVersionUID = -6354027782992894861L;
 
 	protected Integer id;
 	

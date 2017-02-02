@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.ulv.base.model.NamedEntity;
+
 public class Article extends NamedEntity {
 
 	private static final long serialVersionUID = -5712028049441065408L;

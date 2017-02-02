@@ -1,10 +1,9 @@
-package org.ulv.timeline.model;
+package org.ulv.base.model;
 
 
-public class NamedEntity extends BaseEntity
-{
-	private static final long serialVersionUID = 5952341805619253945L;
+public class NamedEntity extends BaseEntity {
 	
+	private static final long serialVersionUID = 6416561598785114826L;
 	private String name;
 	private String descr;
 	
