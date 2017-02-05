@@ -2,6 +2,7 @@ package org.ulv.timeline.service;
 
 import java.util.List;
 
+import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.rss.RssEntry;
 import org.ulv.timeline.model.rss.RssFeed;
 
@@ -19,7 +20,10 @@ public interface RssFeedService {
 	
 	int getAndAddDraftEntries(RssFeed rssFeed);
 	
-	void doneEntry(RssEntry entry);
+	void acceptEntry(RssEntry entry);
 	
 	void acceptDraftEntry(RssEntry entry);
+	void rejectDraftEntry(RssEntry entry);
+	
+	RssEntry saveEntry(RssEntry entry) throws TimelineException;
 }

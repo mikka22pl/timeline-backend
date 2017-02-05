@@ -14,6 +14,10 @@ public class RssEntryDao {
 	private SqlSession sqlSession;
 	
 	public List<RssEntry> getDraftEntries(RssEntry entry) {
+		return sqlSession.selectList("org.ulv.timeline.dao.RssEntryDao.getRssDraftEntry", entry);
+	}
+	
+	public List<RssEntry> getEntries(RssEntry entry) {
 		return sqlSession.selectList("org.ulv.timeline.dao.RssEntryDao.getRssEntry", entry);
 	}
 	
@@ -21,11 +25,27 @@ public class RssEntryDao {
 		sqlSession.insert("org.ulv.timeline.dao.RssEntryDao.addDraftEntry", entry);
 	}
 	
-	public void doneDraftEntry(RssEntry entry) {
-		sqlSession.update("org.ulv.timeline.dao.RssEntryDao.doneDraftEntry", entry);
+	public void acceptDraftEntry(RssEntry entry) {
+		sqlSession.update("org.ulv.timeline.dao.RssEntryDao.acceptDraftEntry", entry);
 	}
 	
-	public void acceptDraftEntry(RssEntry entry) {
-		sqlSession.insert("org.ulv.timeline.dao.RssEntryDao.acceptDraftEntry", entry);
+	public void rejectDraftEntry(RssEntry entry) {
+		sqlSession.update("org.ulv.timeline.dao.RssEntryDao.rejectDraftEntry", entry);
+	}
+	
+	public void addEntry(RssEntry entry) {
+		sqlSession.insert("org.ulv.timeline.dao.RssEntryDao.addEntry", entry);
+	}
+	
+	public void updateEntry(RssEntry entry) {
+		sqlSession.update("org.ulv.timeline.dao.RssEntryDao.updateEntry", entry);
+	}
+	
+	public void assignTags(RssEntry entry) {
+		sqlSession.insert("org.ulv.timeline.dao.RssEntryDao.assignTags", entry);
+	}
+	
+	public void deleteAllTags(Integer id) {
+		sqlSession.delete("org.ulv.timeline.dao.RssEntryDao.deleteAllTags", id);
 	}
 }
