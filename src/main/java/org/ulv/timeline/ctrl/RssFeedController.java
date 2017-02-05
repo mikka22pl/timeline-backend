@@ -1,11 +1,9 @@
 package org.ulv.timeline.ctrl;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +13,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.ulv.timeline.config.HeadersUtil;
+import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.rss.RssEntry;
 import org.ulv.timeline.model.rss.RssFeed;
+import org.ulv.timeline.service.ArticleServiceImpl;
 import org.ulv.timeline.service.RssFeedService;
-
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 
 @Controller
 @RequestMapping("timeline")
 public class RssFeedController {
+	
+	private static final Logger log = LoggerFactory.getLogger(RssFeedController.class);
 
 	@Autowired
 	private RssFeedService rssFeedService;
@@ -63,11 +59,23 @@ public class RssFeedController {
 	
 
 	@RequestMapping(value="/rss/entries/draft/{feedId}", method=RequestMethod.GET)
-	public ResponseEntity<List<RssEntry>> getEntries(
+	public ResponseEntity<List<RssEntry>> getDraftEntries(
 			@PathVariable Integer feedId) {
+		log.info("--> getDraftEntries({})", feedId);
 
 		RssEntry entry = new RssEntry(new RssFeed(feedId));
 		List<RssEntry> entries = rssFeedService.getEntries(entry, true);
+		
+		return new ResponseEntity<List<RssEntry>>(entries, HeadersUtil.HEADERS, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/rss/entries/{feedId}", method=RequestMethod.GET)
+	public ResponseEntity<List<RssEntry>> getEntries(
+			@PathVariable Integer feedId) {
+		log.info("--> getEntries({})", feedId);
+		
+		RssEntry entry = new RssEntry(new RssFeed(feedId));
+		List<RssEntry> entries = rssFeedService.getEntries(entry, false);
 		
 		return new ResponseEntity<List<RssEntry>>(entries, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
@@ -76,7 +84,7 @@ public class RssFeedController {
 	public ResponseEntity<Integer> doneEntry(
 			@RequestBody RssEntry rssEntry) {
 		
-		rssFeedService.doneEntry(rssEntry);
+		rssFeedService.acceptDraftEntry(rssEntry);
 		
 		return new ResponseEntity<Integer>(1, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
@@ -91,6 +99,31 @@ public class RssFeedController {
 		
 		
 		return new ResponseEntity<RssEntry>(entry, HeadersUtil.HEADERS, HttpStatus.OK);
+	}
+
+	@RequestMapping(value="/rss/entry/reject", method=RequestMethod.POST)
+	public ResponseEntity<RssEntry> rejectDraftEntry(
+			@RequestBody RssEntry entry) {
+
+		rssFeedService.rejectDraftEntry(entry);
+		
+		
+		return new ResponseEntity<RssEntry>(entry, HeadersUtil.HEADERS, HttpStatus.OK);
+	}
+
+	@RequestMapping(value="/rss/entry/save", method=RequestMethod.POST)
+	public ResponseEntity<RssEntry> saveEntry(
+			@RequestBody RssEntry entry) {
+		log.info("--> saveEntry({})", entry);
+		try {
+			rssFeedService.saveEntry(entry);
+
+			log.info("<-- saveEntry()");
+			return new ResponseEntity<RssEntry>(entry, HeadersUtil.HEADERS, HttpStatus.OK);
+			
+		} catch (TimelineException e) {
+			return new ResponseEntity<RssEntry>(HeadersUtil.HEADERS, HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	

@@ -69,5 +69,4 @@ public class TagServiceImpl implements TagService {
 		}
 		return ids;
 	}
-
 }

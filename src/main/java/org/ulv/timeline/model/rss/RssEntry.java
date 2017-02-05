@@ -2,8 +2,12 @@ package org.ulv.timeline.model.rss;
 
 import java.util.Date;
 
-public class RssEntry {
+import org.ulv.timeline.model.BaseArticle;
 
+public class RssEntry extends BaseArticle {
+
+	private static final long serialVersionUID = -3846878865585493996L;
+	
 	private String link;
 	private String title;
 	private String descr;
@@ -12,8 +16,10 @@ public class RssEntry {
 	private String guid;
 	private Date pubDate;
 	private Date createdDate;
-	private Boolean done;
-	private Date doneDate;
+	private Boolean accepted;
+	private Boolean rejected;
+	private Date modyfiedDate;
+	private Date feedDate;
 	
 	private final RssFeed rssFeed;
 
@@ -98,19 +104,37 @@ public class RssEntry {
 		this.createdDate = createdDate;
 	}
 
-	public Boolean getDone() {
-		return done;
+	public Boolean getAccepted() {
+		return accepted;
 	}
 
-	public void setDone(Boolean done) {
-		this.done = done;
+	public void setAccepted(Boolean accepted) {
+		this.accepted = accepted;
 	}
 
-	public Date getDoneDate() {
-		return doneDate;
+	public Boolean getRejected() {
+		return rejected;
 	}
 
-	public void setDoneDate(Date doneDate) {
-		this.doneDate = doneDate;
+	public void setRejected(Boolean rejected) {
+		this.rejected = rejected;
 	}
+
+	public Date getModyfiedDate() {
+		return modyfiedDate;
+	}
+
+	public void setModyfiedDate(Date modyfiedDate) {
+		this.modyfiedDate = modyfiedDate;
+	}
+
+	public Date getFeedDate() {
+		return feedDate;
+	}
+
+	public void setFeedDate(Date feedDate) {
+		this.feedDate = feedDate;
+	}
+
+	
 }

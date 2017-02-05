@@ -2,17 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.ulv.timeline.dao.RssEntryDao">
 	
-	<resultMap id="rssEntryMap" type="RssEntry">
+	<resultMap id="rssDraftEntryMap" type="RssEntry">
 		<result property="link"         column="ey_link" />
 		<result property="title" 	    column="ey_title" />
 		<result property="descr" 		column="ey_lead_content" />
 		<result property="pubDate" 	    column="ey_pub_date" />
-		<result property="done" 	    column="ey_done" />
-		<result property="doneDate" 	column="ey_done_date" />
+		<result property="accepted" 	column="ey_accepted" />
+		<result property="rejected" 	column="ey_rejected" />
+		<result property="modyfiedDate" column="ey_modyfied_date" />
 		<result property="createdDate"  column="ey_created_date" />
 		
 		<association property="rssFeed" javaType="RssFeed" 
 			resultMap="org.ulv.timeline.dao.RssFeedDao.feedMap" />
+	</resultMap>
+	
+	<resultMap id="rssEntryMap" type="RssEntry">
+		<result property="id"           column="ey_id" />
+		<result property="link"         column="ey_link" />
+		<result property="title" 	    column="ey_title" />
+		<result property="descr" 		column="ey_lead_content" />
+		<result property="pubDate" 	    column="ey_pub_date" />
+		<result property="feedDate"     column="ey_feed_date" />
+		<result property="createdDate"  column="ey_created_date" />
+		
+		<association property="category" resultMap="org.ulv.timeline.dao.CategoryDao.categoryMap" />
+		
+		<association property="rssFeed" javaType="RssFeed" 
+			resultMap="org.ulv.timeline.dao.RssFeedDao.feedMap" />
+			
+		<collection property="tags" ofType="Tag" resultMap="org.ulv.timeline.dao.TagDao.tagMap" />
 	</resultMap>
 	
 	<sql id="draftEntrySelect">
@@ -21,37 +39,88 @@
 			de.title 		as ey_title,
 			de.lead_content as ey_lead_content,
 			de.pub_date 	as ey_pub_date,
-			de.done 		as ey_done,
-			de.done_date 	as ey_done_date,
+			de.accepted 		as ey_accepted,
+			de.rejected 		as ey_rejected,
+			de.modyfied_date 	as ey_modyfied_date,
 			de.created_date as ey_created_date,
 			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />
 		FROM rss_draft_entries de
 		JOIN rssfeeds f ON f.id = de.rssfeed_id
 	</sql>
+	<sql id="entrySelect">
+		SELECT 
+			en.id 	        as ey_id,
+			en.link 		as ey_link, 
+			en.title 		as ey_title,
+			en.lead_content as ey_lead_content,
+			en.pub_date 	as ey_pub_date,
+			en.created_date as ey_created_date,
+			en.feed_date as ey_feed_date,
+			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />,
+			c.id as cat_id,
+			c.category,
+			t.id as tag_id,
+			t.tag
+		FROM rss_entries en
+		JOIN rssfeeds f ON f.id = en.rssfeed_id
+		LEFT JOIN categories c ON c.id = en.category_id
+		LEFT JOIN entry_tags et ON et.entry_id = en.id
+		LEFT JOIN tags t ON t.id = et.tag_id
+	</sql>
 	
-	<select id="getRssEntry" parameterType="RssEntry" resultMap="rssEntryMap">
+	<select id="getRssDraftEntry" parameterType="RssEntry" resultMap="rssDraftEntryMap">
 		<include refid="draftEntrySelect" />
-		<trim prefix="WHERE">
-			<if test="rssFeed.id != null"> de.rssfeed_id = #{rssFeed.id}</if>
-		</trim>
+		WHERE (accepted != 't' AND rejected != 't')
+		<if test="rssFeed.id != null"> AND de.rssfeed_id = #{rssFeed.id}</if>
 	</select>
 	
+	<select id="getRssEntry" parameterType="RssEntry" resultMap="rssEntryMap">
+		<include refid="entrySelect" />
+		<trim prefix="WHERE">
+			<if test="rssFeed.id != null"> en.rssfeed_id = #{rssFeed.id}</if>
+		</trim>
+		ORDER BY en.created_date, c.id
+	</select>
 	
 	<insert id="addDraftEntry" parameterType="RssEntry">
 		INSERT INTO rss_draft_entries (link, title, lead_content, pub_date, rssfeed_id)
 		VALUES (#{link}, #{title}, #{descr}, #{pubDate}, #{rssFeed.id})
 	</insert>
 	
-	
-	<update id="doneDraftEntry" parameterType="RssEntry">
-		UPDATE rss_draft_entries SET 
-			done = 't',
-			done_date = now()
-		WHERE link = #{link}
-	</update>
-	
-	<insert id="acceptDraftEntry" parameterType="RssEntry">
+	<insert id="addEntry" parameterType="RssEntry">
 		INSERT INTO rss_entries (link, title, lead_content, pub_date, rssfeed_id, feed_date)
 		VALUES (#{link}, #{title}, #{descr}, #{pubDate}, #{rssFeed.id}, now())
 	</insert>
+	
+	<update id="updateEntry" parameterType="RssEntry">
+		UPDATE rss_entries SET 
+			title = #{title}, 
+			lead_content = #{descr},
+			category_id = #{category.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="acceptDraftEntry" parameterType="RssEntry">
+		UPDATE rss_draft_entries SET 
+			accepted = 't',
+			modyfied_date = now()
+		WHERE link = #{link}
+	</update>
+	
+	<update id="rejectDraftEntry" parameterType="RssEntry">
+		UPDATE rss_draft_entries SET 
+			rejected = 't',
+			modyfied_date = now()
+		WHERE link = #{link}
+	</update>
+	
+	<insert id="assignTags" parameterType="RssEntry">
+		INSERT INTO entry_tags 
+		VALUES <foreach collection="tags" item="tag" separator=",">(#{id}, #{tag.id})</foreach>
+	</insert>
+	
+	<delete id="deleteAllTags" parameterType="integer">
+		DELETE FROM entry_tags WHERE entry_id = #{value}
+	</delete>
+	
 </mapper>

@@ -35,5 +35,5 @@
 		INSERT INTO tags (tag, language_id)
 		VALUES (#{name}, 1)
 	</insert>
-	
+
 </mapper>

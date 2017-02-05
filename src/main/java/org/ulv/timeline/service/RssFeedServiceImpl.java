@@ -6,16 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.ulv.timeline.config.HeadersUtil;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.ulv.timeline.dao.RssEntryDao;
 import org.ulv.timeline.dao.RssFeedDao;
+import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.rss.RssEntry;
 import org.ulv.timeline.model.rss.RssFeed;
 
@@ -35,6 +36,12 @@ public class RssFeedServiceImpl implements RssFeedService {
 	
 	@Autowired
 	private RssEntryDao entryDao;
+	
+	@Autowired
+	private CategoryService categoryService;
+	
+	@Autowired
+	private TagService tagService;
 	
 	@Override
 	public List<RssFeed> getRssFeeds() {
@@ -57,10 +64,11 @@ public class RssFeedServiceImpl implements RssFeedService {
 
 	@Override
 	public List<RssEntry> getEntries(RssEntry entry, boolean draft) {
+		log.info("--> getEntries(draft: {})", draft);
 		if (draft) {
-			// TODO: 
+			return entryDao.getDraftEntries(entry);
 		}
-		return entryDao.getDraftEntries(entry);
+		return entryDao.getEntries(entry);
 	}
 
 	@Override
@@ -86,8 +94,8 @@ public class RssFeedServiceImpl implements RssFeedService {
 	}
 	
 	@Override
-	public void doneEntry(RssEntry entry) {
-		entryDao.doneDraftEntry(entry);
+	public void acceptEntry(RssEntry entry) {
+		entryDao.acceptDraftEntry(entry);
 	}
 
 	@Override
@@ -102,8 +110,34 @@ public class RssFeedServiceImpl implements RssFeedService {
 	public void acceptDraftEntry(RssEntry entry) {
 		log.info("--> acceptDraftEntry() {}", entry);
 		
-		entryDao.doneDraftEntry(entry);
 		entryDao.acceptDraftEntry(entry);
+		entryDao.addEntry(entry);
+	}
+
+	@Override
+	public void rejectDraftEntry(RssEntry entry) {
+		log.info("--> rejectDraftEntry() {}", entry);
+		
+		entryDao.rejectDraftEntry(entry);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public RssEntry saveEntry(RssEntry entry) throws TimelineException {
+		log.info("--> saveEntry() {}", entry);
+		
+		categoryService.saveOrFind(entry.getCategory());
+		List<Integer> tagsIds = tagService.saveTags(entry.getTags());
+
+		entryDao.updateEntry(entry);
+		try {
+			entryDao.deleteAllTags(entry.getId());
+			entryDao.assignTags(entry);
+		} catch (DuplicateKeyException e) {
+			log.warn("Assigning tags aborted. duplicate key exception.");
+		}
+		
+		return entry;
 	}
 
 	private List<RssEntry> pullEntries(Integer feedId) {
