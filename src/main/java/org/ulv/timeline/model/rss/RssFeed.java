@@ -8,6 +8,15 @@ public class RssFeed extends NamedEntity {
 
 	private String url;
 	private String category;
+	
+	// number of draft entries
+	private int draftCount;
+	
+	// number of accepted entries
+	private int acceptedCount;
+	
+	// number of loaded new entries
+	private int loadedCount;
 
 	public RssFeed() {
 		this(null);
@@ -31,5 +40,29 @@ public class RssFeed extends NamedEntity {
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	public int getDraftCount() {
+		return draftCount;
+	}
+
+	public void setDraftCount(int draftCount) {
+		this.draftCount = draftCount;
+	}
+
+	public int getAcceptedCount() {
+		return acceptedCount;
+	}
+
+	public void setAcceptedCount(int acceptedCount) {
+		this.acceptedCount = acceptedCount;
+	}
+
+	public int getLoadedCount() {
+		return loadedCount;
+	}
+
+	public void setLoadedCount(int loadedCount) {
+		this.loadedCount = loadedCount;
 	}
 }

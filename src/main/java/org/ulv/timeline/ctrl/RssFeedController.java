@@ -35,14 +35,17 @@ public class RssFeedController {
 	}
 
 	@RequestMapping(value="/rss/feed/draft/{feedId}", method=RequestMethod.GET)
-	public ResponseEntity<Integer> feedDraftEntries(
+	public ResponseEntity<RssFeed> feedDraftEntries(
 			@PathVariable Integer feedId) {
 		
 		RssFeed feed = rssFeedService.getRssFeedById(feedId);
 		// get first one
 		int count = rssFeedService.getAndAddDraftEntries(feed);
 		
-		return new ResponseEntity<Integer>(count, HeadersUtil.HEADERS, HttpStatus.OK);
+		RssFeed rssFeed = new RssFeed(feedId);
+		rssFeed.setLoadedCount(count);
+		
+		return new ResponseEntity<RssFeed>(rssFeed, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
 
 	@RequestMapping(value="/rss/feed/save", method=RequestMethod.POST)
