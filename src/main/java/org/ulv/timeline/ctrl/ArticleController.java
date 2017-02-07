@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.ulv.timeline.config.HeadersUtil;
 import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.Article;
+import org.ulv.timeline.model.rss.RssEntry;
 import org.ulv.timeline.service.ArticleService;
+import org.ulv.timeline.service.RssFeedService;
 
 @Controller
 @RequestMapping("timeline")
@@ -21,6 +23,9 @@ public class ArticleController {
 
 	@Autowired
 	private ArticleService articleService;
+	
+	@Autowired
+	private RssFeedService rssFeedService;
 	
 	@RequestMapping(value="/articles", method=RequestMethod.GET)
 	public ResponseEntity<List<Article>> getArticles() {
@@ -30,10 +35,12 @@ public class ArticleController {
 	}
 	
 	@RequestMapping(value="/articles/{tagId}", method=RequestMethod.GET)
-	public ResponseEntity<List<Article>> getArticlesByTagId(@PathVariable Integer tagId) {
+	public ResponseEntity<List<RssEntry>> getArticlesByTagId(@PathVariable Integer tagId) {
 
-		List<Article> articles = articleService.getArticlesByTagId(tagId);
-		return new ResponseEntity<List<Article>>(articles, HeadersUtil.HEADERS, HttpStatus.OK);
+//		List<Article> articles = articleService.getArticlesByTagId(tagId);
+//		return new ResponseEntity<List<Article>>(articles, HeadersUtil.HEADERS, HttpStatus.OK);
+		List<RssEntry> entries = rssFeedService.getEntriesByTagId(tagId);
+		return new ResponseEntity<List<RssEntry>>(entries, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/article/save", method=RequestMethod.POST, headers="Accept=application/json")

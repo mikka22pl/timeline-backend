@@ -59,8 +59,8 @@
 			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />,
 			c.id as cat_id,
 			c.category,
-			t.id as tag_id,
-			t.tag
+			${tagAlias}.id as tag_id,
+			${tagAlias}.tag
 		FROM rss_entries en
 		JOIN rssfeeds f ON f.id = en.rssfeed_id
 		LEFT JOIN categories c ON c.id = en.category_id
@@ -75,9 +75,19 @@
 	</select>
 	
 	<select id="getRssEntry" parameterType="RssEntry" resultMap="rssEntryMap">
-		<include refid="entrySelect" />
+		<include refid="entrySelect"><property name="tagAlias" value="t"/></include>
 		<trim prefix="WHERE">
 			<if test="rssFeed.id != null"> en.rssfeed_id = #{rssFeed.id}</if>
+		</trim>
+		ORDER BY en.created_date, c.id
+	</select>
+	
+	<select id="getRssEntryByTagId" resultMap="rssEntryMap">
+		<include refid="entrySelect"><property name="tagAlias" value="t2"/></include>
+		LEFT JOIN entry_tags et2 ON et2.entry_id = en.id 
+		LEFT JOIN tags t2 ON t2.id = et2.tag_id
+		<trim prefix="WHERE" prefixOverrides="AND ">
+			<if test="value != null"> AND t.id = #{value}</if>
 		</trim>
 		ORDER BY en.created_date, c.id
 	</select>

@@ -51,6 +51,7 @@
 		<include refid="orderByDate" />
 	</select>
 	
+	
 	<insert id="addArticle" parameterType="Article">
 		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
 			SELECT currval('articles_id_seq') as id

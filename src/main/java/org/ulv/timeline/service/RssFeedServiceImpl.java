@@ -71,6 +71,13 @@ public class RssFeedServiceImpl implements RssFeedService {
 		return entryDao.getEntries(entry);
 	}
 
+
+	@Override
+	public List<RssEntry> getEntriesByTagId(Integer tagId) {
+		log.info("--> getEntriesByTagId(tagId: {})", tagId);
+		return entryDao.getRssEntryByTagId(tagId);
+	}
+	
 	@Override
 	public void addEntry(RssEntry entry, boolean draft) {
 		if (draft) {

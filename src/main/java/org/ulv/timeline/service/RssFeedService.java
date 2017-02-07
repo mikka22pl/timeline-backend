@@ -14,6 +14,8 @@ public interface RssFeedService {
 	
 	List<RssEntry> getEntries(RssEntry entry, boolean draft);
 	
+	List<RssEntry> getEntriesByTagId(Integer tagId);
+	
 	void saveFeed(RssFeed feed);
 	
 	void addEntry(RssEntry entry, boolean draft);
