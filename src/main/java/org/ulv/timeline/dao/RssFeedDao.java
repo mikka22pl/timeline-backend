@@ -17,6 +17,10 @@ public class RssFeedDao {
 		return sqlSession.selectList("org.ulv.timeline.dao.RssFeedDao.getRssFeed", id);
 	}
 	
+	public List<RssFeed> getRssFeedsWithChildrenCounted(Integer feedId) {
+		return sqlSession.selectList("org.ulv.timeline.dao.RssFeedDao.getRssFeedWithChildrenCounted", feedId);
+	}
+	
 	public void addRssFeed(RssFeed feed) {
 		sqlSession.insert("org.ulv.timeline.dao.RssFeedDao.addRssFeed", feed);
 	}

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.ulv.timeline.config.HeadersUtil;
 import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.Tag;
@@ -56,5 +57,13 @@ public class TagController {
 		} catch (TimelineException e) {
 			return new ResponseEntity<Integer>(HeadersUtil.HEADERS, HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@RequestMapping(value = "/tags/linked", method=RequestMethod.POST, headers="Accept=application/json")
+	public ResponseEntity<List<Tag>> getTagsByArticlesTags(@RequestBody List<Tag> tags) {
+		
+		List<Tag> linkedTags = tagService.getTagsByArticlesTags(tags);
+		
+		return new ResponseEntity<List<Tag>>(linkedTags, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
 }

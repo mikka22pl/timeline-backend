@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.ulv.timeline.dao.TagDao;
 import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.Tag;
+import org.ulv.timeline.model.rss.RssEntry;
 
 @Service("tagService")
 public class TagServiceImpl implements TagService {
@@ -68,5 +69,13 @@ public class TagServiceImpl implements TagService {
 			ids.add(tag.getId());
 		}
 		return ids;
+	}
+
+	@Override
+	public List<Tag> getTagsByArticlesTags(List<Tag> tags) {
+		RssEntry entry = new RssEntry();
+		entry.setTags(tags);
+		
+		return tagDao.getTagsByArticlesTags(entry);
 	}
 }
