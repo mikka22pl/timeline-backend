@@ -16,4 +16,6 @@ public interface TagService {
 	void saveOrFind(Tag tag) throws TimelineException;
 	
 	List<Integer> saveTags(List<Tag> tags) throws TimelineException;
+	
+	List<Tag> getTagsByArticlesTags(List<Tag> tags);
 }

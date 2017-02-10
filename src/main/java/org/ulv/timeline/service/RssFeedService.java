@@ -8,7 +8,7 @@ import org.ulv.timeline.model.rss.RssFeed;
 
 public interface RssFeedService {
 
-	List<RssFeed> getRssFeeds();
+	List<RssFeed> getRssFeeds(boolean withCounts);
 	
 	RssFeed getRssFeedById(Integer id);
 	

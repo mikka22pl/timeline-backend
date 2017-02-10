@@ -30,7 +30,7 @@ public class RssFeedController {
 	
 	@RequestMapping(value="/rss/feeds", method=RequestMethod.GET)
 	public ResponseEntity<List<RssFeed>> getRssFeeds() {
-		List<RssFeed> feeds = rssFeedService.getRssFeeds();
+		List<RssFeed> feeds = rssFeedService.getRssFeeds(true);
 		return new ResponseEntity<List<RssFeed>>(feeds, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
 

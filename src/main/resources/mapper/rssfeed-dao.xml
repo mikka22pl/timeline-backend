@@ -3,11 +3,13 @@
 <mapper namespace="org.ulv.timeline.dao.RssFeedDao">
 	
 	<resultMap id="feedMap" type="RssFeed">
-		<id     property="id"       column="rss_id" />
-		<result property="name" 	column="rss_distributor" />
-		<result property="url" 		column="rss_feed_url" />
-		<result property="category" column="rss_category_name" />
-		<result property="createdDate" column="rss_created_date" />
+		<id     property="id"            column="rss_id" />
+		<result property="name" 	     column="rss_distributor" />
+		<result property="url" 		     column="rss_feed_url" />
+		<result property="category"      column="rss_category_name" />
+		<result property="createdDate"   column="rss_created_date" />
+		<result property="draftCount"    column="rss_draft_count" />
+		<result property="acceptedCount" column="rss_accepted_count" />
 	</resultMap>
 	
 	<sql id="feedColumns">
@@ -18,14 +20,33 @@
 		f.created_date as rss_created_date
 	</sql>
 	
+	<sql id="counts">
+		(SELECT count(1) FROM rss_draft_entries WHERE rssfeed_id = f.id AND rejected = 'f' AND accepted = 'f') as rss_draft_count, 
+		(SELECT count(1) FROM rss_entries WHERE rssfeed_id = f.id AND category_id is null) as rss_accepted_count
+	</sql>
+	
 	<sql id="feedSelect">
 		SELECT 
 		<include refid="feedColumns" />
 		FROM rssfeeds f
 	</sql>
 	
+	<sql id="feedSelectCounts">
+		SELECT 
+		<include refid="feedColumns" />,
+		<include refid="counts" />
+		FROM rssfeeds f
+	</sql>
+	
 	<select id="getRssFeed" parameterType="integer" resultMap="feedMap">
 		<include refid="feedSelect" />
+		<trim prefix="WHERE">
+			<if test="value != null"> f.id = #{value}</if>
+		</trim>
+	</select>
+	
+	<select id="getRssFeedWithChildrenCounted" parameterType="integer" resultMap="feedMap">
+		<include refid="feedSelectCounts" />
 		<trim prefix="WHERE">
 			<if test="value != null"> f.id = #{value}</if>
 		</trim>

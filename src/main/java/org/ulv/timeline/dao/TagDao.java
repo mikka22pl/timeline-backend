@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.ulv.timeline.model.Tag;
+import org.ulv.timeline.model.rss.RssEntry;
 
 @Component
 public class TagDao {
@@ -23,5 +24,9 @@ public class TagDao {
 	
 	public int addTag(Tag tag) {
 		return sqlSession.insert("addTag", tag);
+	}
+	
+	public List<Tag> getTagsByArticlesTags(RssEntry rssEntry) {
+		return sqlSession.selectList("getTagsByArticlesTags", rssEntry);
 	}
 }

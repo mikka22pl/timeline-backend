@@ -9,10 +9,14 @@
 		<association property="language" resultMap="org.ulv.timeline.dao.LanguageDao.languageMap" />
 	</resultMap>
 	
+	<sql id="tagCols">
+		t.id as tag_id, 
+		t.tag
+	</sql>
+	
 	<sql id="tagSelect">
 		SELECT 
-			t.id as tag_id, 
-			t.tag,
+			<include refid="tagCols" />,
 			l.id as language_id,
 			l.language
 		FROM tags t
@@ -35,5 +39,20 @@
 		INSERT INTO tags (tag, language_id)
 		VALUES (#{name}, 1)
 	</insert>
+	
+	<select id="getTagsByArticlesTags" parameterType="RssEntry" resultMap="tagMap">
+		SELECT DISTINCT <include refid="tagCols" /> 
+		FROM rss_entries ent1
+		JOIN entry_tags et1 ON et1.entry_id = ent1.id
+		JOIN tags t ON t.id = et1.tag_id
+		WHERE ent1.id IN ( 
+			SELECT ent.id FROM entry_tags et
+			JOIN tags tg ON tg.id = et.tag_id
+			JOIN rss_entries ent ON ent.id = et.entry_id
+			WHERE tg.id IN (<foreach collection="tags" item="tag" separator=",">#{tag.id}</foreach>)
+			GROUP BY ent.id
+			HAVING count(1) = ${tags.size()})
+		
+	</select>
 
 </mapper>
