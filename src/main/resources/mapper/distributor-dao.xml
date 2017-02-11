@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.DistributorDao">
+	
+	<resultMap id="distributorMap" type="Distributor">
+		<id     property="id"       column="dist_id" />
+		<result property="name" 	column="service_name" />
+		
+		<association property="language" resultMap="org.ulv.timeline.dao.LanguageDao.languageMap" />
+	</resultMap>
+	
+	<sql id="distributorCols">
+		d.id as dist_id, 
+		d.service_name,
+		l.id as language_id,
+		l.language
+	</sql>
+	
+	<select id="getDistributor" parameterType="Distributor" resultMap="distributorMap">
+		SELECT 
+			<include refid="distributorCols" />
+		FROM distributors d
+		JOIN languages l ON l.id = d.language_id
+		<trim prefix="WHERE" prefixOverrides="AND ">
+			<if test="id != null">   AND d.id = #{id} </if>
+		</trim>
+	</select>
+	
+</mapper>

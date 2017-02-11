@@ -26,6 +26,9 @@
         
         <rss.rome>1.0</rss.rome>
         
+        <flyway.version>4.1.0</flyway.version>
+        <postgres.version>9.0-801.jdbc3</postgres.version>
+        
 		<maven.build.timestamp.format>yyMMddHHmm</maven.build.timestamp.format>
 		<webapp.name>timeline</webapp.name>
 		<java.version>1.7</java.version>
@@ -49,9 +52,15 @@
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.0-801.jdbc3</version>
+			<version>${postgres.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.flywaydb</groupId>
+		    <artifactId>flyway-core</artifactId>
+		    <version>${flyway.version}</version>
+		</dependency>
+		
 		
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -134,7 +143,26 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway.version}</version>
+                <configuration>
+                    <url>jdbc:postgresql://localhost:5432/timeline?charSet=utf-8</url>
+                    <user>spring</user>
+                    <password>spring</password>
+                    <schemas>
+                    	<schema>timeline</schema>
+                    </schemas>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgres.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin> -->
         </plugins>
     </build>
-
 </project>

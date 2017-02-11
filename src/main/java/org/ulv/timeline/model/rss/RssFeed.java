@@ -1,6 +1,7 @@
 package org.ulv.timeline.model.rss;
 
 import org.ulv.base.model.NamedEntity;
+import org.ulv.timeline.model.Distributor;
 
 public class RssFeed extends NamedEntity {
 
@@ -8,6 +9,7 @@ public class RssFeed extends NamedEntity {
 
 	private String url;
 	private String category;
+	private Distributor distributor;
 	
 	// number of draft entries
 	private int draftCount;
@@ -24,6 +26,7 @@ public class RssFeed extends NamedEntity {
 	
 	public RssFeed(Integer id) {
 		super(id);
+		this.distributor = new Distributor();
 	}
 	
 	public String getUrl() {
@@ -64,5 +67,13 @@ public class RssFeed extends NamedEntity {
 
 	public void setLoadedCount(int loadedCount) {
 		this.loadedCount = loadedCount;
+	}
+
+	public Distributor getDistributor() {
+		return distributor;
+	}
+
+	public void setDistributor(Distributor distributor) {
+		this.distributor = distributor;
 	}
 }
