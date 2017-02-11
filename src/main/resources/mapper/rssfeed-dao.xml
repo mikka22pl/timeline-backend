@@ -4,17 +4,17 @@
 	
 	<resultMap id="feedMap" type="RssFeed">
 		<id     property="id"            column="rss_id" />
-		<result property="name" 	     column="rss_distributor" />
 		<result property="url" 		     column="rss_feed_url" />
 		<result property="category"      column="rss_category_name" />
 		<result property="createdDate"   column="rss_created_date" />
 		<result property="draftCount"    column="rss_draft_count" />
 		<result property="acceptedCount" column="rss_accepted_count" />
+		
+		<association property="distributor" resultMap="org.ulv.timeline.dao.DistributorDao.distributorMap" />
 	</resultMap>
 	
 	<sql id="feedColumns">
 		f.id as rss_id, 
-		f.distributor as rss_distributor,
 		f.feed_url as rss_feed_url,
 		f.category_name as rss_category_name,
 		f.created_date as rss_created_date
@@ -27,15 +27,21 @@
 	
 	<sql id="feedSelect">
 		SELECT 
-		<include refid="feedColumns" />
+		<include refid="feedColumns" />,
+		<include refid="org.ulv.timeline.dao.DistributorDao.distributorCols" />
 		FROM rssfeeds f
+		JOIN distributors d ON d.id = f.distributor_id
+		JOIN languages l ON l.id = d.language_id
 	</sql>
 	
 	<sql id="feedSelectCounts">
 		SELECT 
 		<include refid="feedColumns" />,
+		<include refid="org.ulv.timeline.dao.DistributorDao.distributorCols" />,
 		<include refid="counts" />
 		FROM rssfeeds f
+		JOIN distributors d ON d.id = f.distributor_id
+		JOIN languages l ON l.id = d.language_id
 	</sql>
 	
 	<select id="getRssFeed" parameterType="integer" resultMap="feedMap">
@@ -50,6 +56,7 @@
 		<trim prefix="WHERE">
 			<if test="value != null"> f.id = #{value}</if>
 		</trim>
+		ORDER BY d.service_name
 	</select>
 	
 	
@@ -57,8 +64,8 @@
 		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
 			SELECT currval('rssfeeds_id_seq') as id
 		</selectKey>
-		INSERT INTO rssfeeds (feed_url, distributor, category_name)
-		VALUES (#{url}, #{name}, #{category})
+		INSERT INTO rssfeeds (feed_url, category_name)
+		VALUES (#{url}, #{category})
 	</insert>
 	
 </mapper>
