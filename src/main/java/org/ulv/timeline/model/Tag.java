@@ -8,6 +8,11 @@ public class Tag extends NamedEntity {
 	private Language language;
 
 	public Tag() {
+		this(null);
+	}
+	
+	public Tag(String name) {
+		super(name);
 		this.language = new Language();
 	}
 	

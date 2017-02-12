@@ -30,7 +30,7 @@
 		<association property="rssFeed" javaType="RssFeed" 
 			resultMap="org.ulv.timeline.dao.RssFeedDao.feedMap" />
 			
-		<collection property="tags" ofType="Tag" resultMap="org.ulv.timeline.dao.TagDao.tagMap" />
+		<collection property="tags" ofType="Tag" resultMap="org.ulv.timeline.dao.TagDao.tagMap" notNullColumn="tag_id" />
 	</resultMap>
 	
 	<sql id="draftEntrySelect">
@@ -43,9 +43,11 @@
 			de.rejected 		as ey_rejected,
 			de.modyfied_date 	as ey_modyfied_date,
 			de.created_date as ey_created_date,
-			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />
+			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />,
+			<include refid="org.ulv.timeline.dao.DistributorDao.distributorCols" />
 		FROM rss_draft_entries de
 		JOIN rssfeeds f ON f.id = de.rssfeed_id
+		<include refid="org.ulv.timeline.dao.RssFeedDao.distributorJoins" />
 	</sql>
 	<sql id="entrySelect">
 		SELECT 
@@ -57,6 +59,7 @@
 			en.created_date as ey_created_date,
 			en.feed_date as ey_feed_date,
 			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />,
+			<include refid="org.ulv.timeline.dao.DistributorDao.distributorCols" />,
 			c.id as cat_id,
 			c.category,
 			${tagAlias}.id as tag_id,
@@ -66,6 +69,7 @@
 		LEFT JOIN categories c ON c.id = en.category_id
 		LEFT JOIN entry_tags et ON et.entry_id = en.id
 		LEFT JOIN tags t ON t.id = et.tag_id
+		<include refid="org.ulv.timeline.dao.RssFeedDao.distributorJoins" />
 	</sql>
 	
 	<select id="getRssDraftEntry" parameterType="RssEntry" resultMap="rssDraftEntryMap">
@@ -80,6 +84,7 @@
 			<if test="rssFeed.id != null"> en.rssfeed_id = #{rssFeed.id}</if>
 		</trim>
 		ORDER BY en.created_date, c.id
+		LIMIT 20
 	</select>
 	
 	<select id="getRssEntryByTagId" resultMap="rssEntryMap">
@@ -128,6 +133,10 @@
 		INSERT INTO entry_tags 
 		VALUES <foreach collection="tags" item="tag" separator=",">(#{id}, #{tag.id})</foreach>
 	</insert>
+	
+	<delete id="removeTags" parameterType="AssignedItem">
+		DELETE FROM entry_tags WHERE entry_id = #{baseId} AND tag_id = #{assigneeId}
+	</delete>
 	
 	<delete id="deleteAllTags" parameterType="integer">
 		DELETE FROM entry_tags WHERE entry_id = #{value}

@@ -3,7 +3,10 @@ package org.ulv.timeline.service;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -15,9 +18,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.ulv.timeline.dao.RssEntryDao;
 import org.ulv.timeline.dao.RssFeedDao;
+import org.ulv.timeline.dao.TagDao;
 import org.ulv.timeline.exceptions.TimelineException;
+import org.ulv.timeline.model.AssignedItem;
+import org.ulv.timeline.model.Tag;
 import org.ulv.timeline.model.rss.RssEntry;
 import org.ulv.timeline.model.rss.RssFeed;
+import org.ulv.timeline.model.timeline.Timeline;
 
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -37,10 +44,16 @@ public class RssFeedServiceImpl implements RssFeedService {
 	private RssEntryDao entryDao;
 	
 	@Autowired
+	private TagDao tagDao;
+	
+	@Autowired
 	private CategoryService categoryService;
 	
 	@Autowired
 	private TagService tagService;
+	
+	@Autowired
+	private TimelineService timelineService;
 	
 	@Override
 	public List<RssFeed> getRssFeeds(boolean withCounts) {
@@ -133,17 +146,46 @@ public class RssFeedServiceImpl implements RssFeedService {
 		log.info("--> saveEntry() {}", entry);
 		
 		categoryService.saveOrFind(entry.getCategory());
-		List<Integer> tagsIds = tagService.saveTags(entry.getTags());
+		Integer languageId = entry.getRssFeed().getDistributor().getLanguage().getId();
+		List<Integer> tagsIds = tagService.saveTags(entry.getTags(), languageId);
 
+		// TODO: fix it for update case
+		List<Integer> timelineIds = entry.getTimelines().stream()
+				.map(Timeline::getId)
+				.collect(Collectors.toList());
+		timelineService.assignArticle(timelineIds, entry);
+		
 		entryDao.updateEntry(entry);
 		try {
-			entryDao.deleteAllTags(entry.getId());
-			entryDao.assignTags(entry);
+			assignTags(entry);
 		} catch (DuplicateKeyException e) {
 			log.warn("Assigning tags aborted. duplicate key exception.");
 		}
 		
 		return entry;
+	}
+
+	private void assignTags(RssEntry entry) {
+		log.info("--> assignTags()");
+
+		List<Tag> dbTags = tagDao.getEntryTags(entry.getId());
+		HashSet<Integer> dbTagIds = dbTags.stream()
+				.map(Tag::getId)
+				.collect(Collectors.toCollection(HashSet::new));
+		
+		HashSet<Integer> saveIds = entry.getTags().stream()
+				.map(Tag::getId)
+				.filter(id -> !dbTagIds.contains(id))
+				.collect(Collectors.toCollection(HashSet::new));
+		
+		HashSet<Integer> removeIds = dbTagIds.stream()
+				.filter(id -> !saveIds.contains(id))
+				.collect(Collectors.toCollection(HashSet::new));
+		
+		removeIds.forEach(id -> entryDao.removeTags(new AssignedItem(entry.getId(), id)));
+		if (saveIds.size() > 0) {
+			entryDao.assignTags(entry);
+		}
 	}
 
 	private List<RssEntry> pullEntries(Integer feedId) {

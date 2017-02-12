@@ -1,13 +1,17 @@
 package org.ulv.timeline.model.rss;
 
 import java.util.Date;
+import java.util.List;
 
 import org.ulv.timeline.model.BaseArticle;
+import org.ulv.timeline.model.timeline.Timeline;
+
+import com.google.common.collect.Lists;
 
 public class RssEntry extends BaseArticle {
 
 	private static final long serialVersionUID = -3846878865585493996L;
-	
+
 	private String link;
 	private String title;
 	private String descr;
@@ -20,13 +24,14 @@ public class RssEntry extends BaseArticle {
 	private Boolean rejected;
 	private Date modyfiedDate;
 	private Date feedDate;
-	
+
 	private final RssFeed rssFeed;
+	private List<Timeline> timelines;
 
 	public RssEntry() {
-		this.rssFeed = new RssFeed();
+		this(new RssFeed());
 	}
-	
+
 	public RssEntry(RssFeed rssFeed) {
 		this(null, rssFeed);
 	}
@@ -34,6 +39,7 @@ public class RssEntry extends BaseArticle {
 	public RssEntry(String title, RssFeed rssFeed) {
 		this.rssFeed = rssFeed;
 		this.title = title;
+		this.timelines = Lists.newArrayList();
 	}
 
 	public String getTitle() {
@@ -136,5 +142,12 @@ public class RssEntry extends BaseArticle {
 		this.feedDate = feedDate;
 	}
 
-	
+	public List<Timeline> getTimelines() {
+		return timelines;
+	}
+
+	public void setTimelines(List<Timeline> timelines) {
+		this.timelines = timelines;
+	}
+
 }

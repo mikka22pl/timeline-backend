@@ -11,24 +11,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.ulv.timeline.config.HeadersUtil;
-import org.ulv.timeline.model.Language;
-import org.ulv.timeline.service.LanguageService;
+import org.ulv.timeline.model.timeline.Timeline;
+import org.ulv.timeline.service.TimelineService;
 
 @RestController
 @RequestMapping("timeline")
-public class LanguageController {
+public class TimelineController {
+	
+	private static final Logger log = LoggerFactory.getLogger(TimelineController.class);
 
-	private static final Logger log = LoggerFactory.getLogger(LanguageController.class);
-	
 	@Autowired
-	private LanguageService languageService;
+	private TimelineService timelineService;
 	
-	@RequestMapping(value="languages", method=RequestMethod.GET)
-	public ResponseEntity<List<Language>> getLanguages() {
-		log.info("--> getLanguages()");
+	@RequestMapping(value="timelines", method=RequestMethod.GET)
+	public ResponseEntity<List<Timeline>> getTimelines() {
+		log.info("--> getTimelines()");
 		
-		List<Language> languages = languageService.getLanguages();
+		List<Timeline> timelines = timelineService.getTimelines();
 		
-		return new ResponseEntity<List<Language>>(languages, HeadersUtil.HEADERS, HttpStatus.OK);
+		return new ResponseEntity<List<Timeline>>(timelines, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
 }

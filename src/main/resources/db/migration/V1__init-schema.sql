@@ -57,6 +57,22 @@ CREATE TABLE tags (
     language_id integer NOT NULL
 );
 
+CREATE TABLE timelines
+(
+  id serial NOT NULL,
+  timeline_name character varying(50) NOT NULL,
+  descr text,
+  created_date timestamp with time zone NOT NULL DEFAULT now(),
+  modified_date timestamp with time zone
+);
+
+CREATE TABLE timeline_articles
+(
+  timeline_id integer NOT NULL,
+  article_id bigint NOT NULL
+);
+  
+  
 
 CREATE SEQUENCE categories_id_seq
     START WITH 1
@@ -106,9 +122,22 @@ CREATE SEQUENCE tags_id_seq
     CACHE 1;
 ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
+CREATE SEQUENCE timelines_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1
+  CACHE 1;
+ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
+ALTER SEQUENCE timelines_id_seq OWNER TO timelines.id;
+
+
 ALTER TABLE ONLY categories ALTER COLUMN id SET DEFAULT nextval('categories_id_seq'::regclass);
 ALTER TABLE ONLY distributors ALTER COLUMN id SET DEFAULT nextval('distributors_id_seq'::regclass);
 ALTER TABLE ONLY languages ALTER COLUMN id SET DEFAULT nextval('languages_id_seq'::regclass);
 ALTER TABLE ONLY rss_entries ALTER COLUMN id SET DEFAULT nextval('rss_entries_id_seq'::regclass);
 ALTER TABLE ONLY rssfeeds ALTER COLUMN id SET DEFAULT nextval('rssfeeds_id_seq'::regclass);
 ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
+ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
+ALTER TABLE ONLY timelines ALTER COLUMN id SET DEFAULT nextval('timelines_id_seq'::regclass);
+

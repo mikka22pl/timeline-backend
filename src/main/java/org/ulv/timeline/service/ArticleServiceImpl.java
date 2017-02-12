@@ -56,7 +56,7 @@ public class ArticleServiceImpl implements ArticleService {
 		if (article.isNew()) {
 			
 			categoryService.saveOrFind(article.getCategory());
-			List<Integer> tagsIds = tagService.saveTags(article.getTags());
+//			List<Integer> tagsIds = tagService.saveTags(article.getTags());
 			
 			res = articleDao.addArticle(article);
 			

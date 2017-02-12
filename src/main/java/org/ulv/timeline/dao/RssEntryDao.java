@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.ulv.timeline.model.AssignedItem;
 import org.ulv.timeline.model.rss.RssEntry;
 
 @Component
@@ -47,6 +48,10 @@ public class RssEntryDao {
 	
 	public void assignTags(RssEntry entry) {
 		sqlSession.insert("org.ulv.timeline.dao.RssEntryDao.assignTags", entry);
+	}
+	
+	public void removeTags(AssignedItem assignedItem) {
+		sqlSession.delete("org.ulv.timeline.dao.RssEntryDao.removeTags", assignedItem);
 	}
 	
 	public void deleteAllTags(Integer id) {
