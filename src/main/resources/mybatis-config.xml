@@ -15,5 +15,6 @@
         <mapper resource="mapper/rssentry-dao.xml"/>
         <mapper resource="mapper/rssfeed-dao.xml"/>
         <mapper resource="mapper/tag-dao.xml"/>
+        <mapper resource="mapper/timeline-dao.xml"/>
     </mappers>
 </configuration>

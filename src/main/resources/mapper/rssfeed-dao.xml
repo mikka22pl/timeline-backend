@@ -25,13 +25,17 @@
 		(SELECT count(1) FROM rss_entries WHERE rssfeed_id = f.id AND category_id is null) as rss_accepted_count
 	</sql>
 	
+	<sql id="distributorJoins">
+		JOIN distributors d ON d.id = f.distributor_id
+		JOIN languages l ON l.id = d.language_id
+	</sql>
+	
 	<sql id="feedSelect">
 		SELECT 
 		<include refid="feedColumns" />,
 		<include refid="org.ulv.timeline.dao.DistributorDao.distributorCols" />
 		FROM rssfeeds f
-		JOIN distributors d ON d.id = f.distributor_id
-		JOIN languages l ON l.id = d.language_id
+		<include refid="distributorJoins" />
 	</sql>
 	
 	<sql id="feedSelectCounts">
@@ -40,8 +44,7 @@
 		<include refid="org.ulv.timeline.dao.DistributorDao.distributorCols" />,
 		<include refid="counts" />
 		FROM rssfeeds f
-		JOIN distributors d ON d.id = f.distributor_id
-		JOIN languages l ON l.id = d.language_id
+		<include refid="distributorJoins" />
 	</sql>
 	
 	<select id="getRssFeed" parameterType="integer" resultMap="feedMap">

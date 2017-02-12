@@ -23,13 +23,21 @@
 		JOIN languages l ON l.id = t.language_id
 	</sql>
 	
-	<select id="getTag" resultMap="tagMap">
+	<select id="getTag" parameterType="integer" resultMap="tagMap">
 		<include refid="tagSelect" />
+		WHERE t.language_id = #{value}
 	</select>
 	
-	<select id="getTagByName" resultMap="tagMap" parameterType="string">
+	<select id="getTagByName" resultMap="tagMap" parameterType="Tag">
 		<include refid="tagSelect" />
-		WHERE LOWER(t.tag) = LOWER(#{value})
+		WHERE t.language_id = #{language.id}
+		AND LOWER(t.tag) = LOWER(#{name})
+	</select>
+	
+	<select id="getEntryTags" resultMap="tagMap" parameterType="integer">
+		<include refid="tagSelect" />
+		JOIN entry_tags et ON et.tag_id = t.id
+		WHERE et.entry_id = #{value}
 	</select>
 	
 	<insert id="addTag" parameterType="Tag">
@@ -37,7 +45,7 @@
 			SELECT currval('tags_id_seq') as id
 		</selectKey>
 		INSERT INTO tags (tag, language_id)
-		VALUES (#{name}, 1)
+		VALUES (#{name}, #{language.id})
 	</insert>
 	
 	<select id="getTagsByArticlesTags" parameterType="RssEntry" resultMap="tagMap">

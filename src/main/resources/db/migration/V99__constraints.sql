@@ -28,6 +28,15 @@ ALTER TABLE ONLY rssfeeds
 ALTER TABLE ONLY tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY timelines
+    ADD CONSTRAINT timelines_pkey PRIMARY KEY (id);
+    
+ALTER TABLE ONLY timeline_articles
+    ADD CONSTRAINT timeline_articles_pkey PRIMARY KEY (timeline_id, article_id);
+    
+ALTER TABLE ONLY timeline_articles
+    ADD CONSTRAINT timelines_link_key UNIQUE (timeline_id, article_id);
+    
 ALTER TABLE ONLY tags
     ADD CONSTRAINT tags_tag_language_id_key UNIQUE (tag, language_id);
 
@@ -48,3 +57,11 @@ ALTER TABLE ONLY rss_draft_entries
 
 ALTER TABLE ONLY rss_entries
     ADD CONSTRAINT rss_entries_rssfeed_id_fkey FOREIGN KEY (rssfeed_id) REFERENCES rssfeeds(id);
+
+
+
+ALTER TABLE ONLY timeline_articles
+    ADD CONSTRAINT timeline_articles_timeline_id_fkey FOREIGN KEY (timeline_id) REFERENCES timelines(id);
+    
+ALTER TABLE ONLY timeline_articles
+    ADD CONSTRAINT timeline_articles_article_id_fkey FOREIGN KEY (article_id) REFERENCES rss_entries(id);

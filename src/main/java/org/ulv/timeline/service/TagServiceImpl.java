@@ -21,15 +21,17 @@ public class TagServiceImpl implements TagService {
 	private TagDao tagDao;
 	
 	@Override
-	public List<Tag> getTags() {
-		log.info("--> getTags()");
-		return tagDao.getTags();
+	public List<Tag> getTags(Integer languageId) {
+		log.info("--> getTags({})", languageId);
+		return tagDao.getTags(languageId);
 	}
 
 	@Override
-	public Tag getTagByName(String name) {
-		log.info("--> getTagByName({})", name);
-		return tagDao.getTagByName(name);
+	public Tag getTagByName(String name, Integer languageId) {
+		log.info("--> getTagByName({}, {})", name, languageId);
+		Tag tag = new Tag(name);
+		tag.getLanguage().setId(languageId);
+		return tagDao.getTagByName(tag);
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	public void saveOrFind(Tag tag) throws TimelineException {
-		Tag dbTag = getTagByName(tag.getName());
+		Tag dbTag = getTagByName(tag.getName(), tag.getLanguage().getId());
 		if (dbTag == null) {
 			saveTag(tag);
 		} else {
@@ -57,13 +59,14 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
-	public List<Integer> saveTags(List<Tag> tags) throws TimelineException {
-		log.info("--> saveTags()");
+	public List<Integer> saveTags(List<Tag> tags, Integer languageId) throws TimelineException {
+		log.info("--> saveTags({})", languageId);
 		List<Integer> ids = new ArrayList<Integer>();
 		for (Tag tag : tags) {
+			tag.getLanguage().setId(languageId);
 			saveOrFind(tag);
 			if (tag.getId() == null) {
-				Tag dbTag = getTagByName(tag.getName());
+				Tag dbTag = getTagByName(tag.getName(), languageId);
 				tag.setId(dbTag.getId());
 			}
 			ids.add(tag.getId());

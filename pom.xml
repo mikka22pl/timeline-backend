@@ -5,7 +5,7 @@
 
     <groupId>org.ulv</groupId>
     <artifactId>timeline</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -31,7 +31,7 @@
         
 		<maven.build.timestamp.format>yyMMddHHmm</maven.build.timestamp.format>
 		<webapp.name>timeline</webapp.name>
-		<java.version>1.7</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 	
 	

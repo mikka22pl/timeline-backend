@@ -11,17 +11,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.ulv.timeline.config.HeadersUtil;
 import org.ulv.timeline.model.Category;
 import org.ulv.timeline.model.Language;
 import org.ulv.timeline.service.CategoryService;
 import org.ulv.timeline.service.LanguageService;
 
-@Controller
+@RestController
 @RequestMapping("timeline")
 public class CategoryController {
 
-private static final Logger log = LoggerFactory.getLogger(CategoryController.class);
+	private static final Logger log = LoggerFactory.getLogger(CategoryController.class);
 	
 	@Autowired
 	private CategoryService categoryService;

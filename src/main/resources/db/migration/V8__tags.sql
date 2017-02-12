@@ -564,5 +564,24 @@ INSERT INTO tags (id, tag, language_id) VALUES (570, 'irak', 1);
 INSERT INTO tags (id, tag, language_id) VALUES (571, 'słowenia', 1);
 INSERT INTO tags (id, tag, language_id) VALUES (572, 'grecja', 1);
 INSERT INTO tags (id, tag, language_id) VALUES (573, 'pomoc dla grecji', 1);
+INSERT INTO tags (id, tag, language_id) VALUES (574, 'snowden', 1);
+INSERT INTO tags (id, tag, language_id) VALUES (575, 'narkotyki', 1);
+INSERT INTO tags (id, tag, language_id) VALUES (576, 'mfw', 1);
+INSERT INTO tags (id, tag, language_id) VALUES (577, 'państwa narodowe', 1);
+INSERT INTO tags (id, tag, language_id) VALUES (578, 'russia', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (579, 'secret inteligence', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (580, 'safety agency', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (581, 'ukraine', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (582, 'conflict', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (583, 'donetsk', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (584, 'separatism', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (585, 'ukrainian conflict', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (586, 'terrorism', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (587, 'terrorist attack', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (588, 'canada', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (589, 'quebec', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (590, 'islamism', 2);
+INSERT INTO tags (id, tag, language_id) VALUES (591, 'shooting', 2);
 
-SELECT pg_catalog.setval('tags_id_seq', 573, true);
+
+SELECT pg_catalog.setval('tags_id_seq', 591, true);

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ulv.timeline.dao.TimelineDao">
+	
+	<resultMap id="timelineMap" type="Timeline">
+		<id     property="id"       column="tl_id" />
+		<result property="name" 	column="tl_name" />
+		<result property="descr" 	column="tl_descr" />
+		<result property="createdDate" 		column="tl_created_date" />
+		<result property="modifiedDate" 	column="tl_modified_date" />
+	</resultMap>
+	
+	<sql id="timelineCols">
+		tl.id as tl_id, 
+		tl.timeline_name as tl_name,
+		tl.descr as tl_descr,
+		tl.created_date as tl_created_date,
+		tl.modified_date as tl_modified_date
+	</sql>
+	
+	<sql id="timelineSelect">
+		SELECT 
+			<include refid="timelineCols" />
+		FROM timelines tl
+	</sql>
+	
+	<select id="getTimeline" resultMap="timelineMap">
+		<include refid="timelineSelect" />
+	</select>
+	
+	<insert id="assignArticle" parameterType="AssignedItem">
+		INSERT INTO timeline_articles (timeline_id, article_id)
+		VALUES (#{baseId}, #{assigneeId})
+	</insert>
+
+</mapper>
