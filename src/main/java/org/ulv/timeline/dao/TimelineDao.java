@@ -21,4 +21,8 @@ public class TimelineDao {
 	public void assignArticle(AssignedItem assignedItem) {
 		sqlSession.insert("org.ulv.timeline.dao.TimelineDao.assignArticle", assignedItem);
 	}
+	
+	public void addTimeline(Timeline timeline) {
+		sqlSession.insert("org.ulv.timeline.dao.TimelineDao.addTimeline", timeline);
+	}
 }

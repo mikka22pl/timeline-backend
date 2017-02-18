@@ -31,6 +31,8 @@
 			resultMap="org.ulv.timeline.dao.RssFeedDao.feedMap" />
 			
 		<collection property="tags" ofType="Tag" resultMap="org.ulv.timeline.dao.TagDao.tagMap" notNullColumn="tag_id" />
+			
+		<collection property="timelines" ofType="Timeline" resultMap="org.ulv.timeline.dao.TimelineDao.timelineMap" notNullColumn="tl_id" />
 	</resultMap>
 	
 	<sql id="draftEntrySelect">
@@ -49,7 +51,7 @@
 		JOIN rssfeeds f ON f.id = de.rssfeed_id
 		<include refid="org.ulv.timeline.dao.RssFeedDao.distributorJoins" />
 	</sql>
-	<sql id="entrySelect">
+	<sql id="entrySelectWithoutTags">
 		SELECT 
 			en.id 	        as ey_id,
 			en.link 		as ey_link, 
@@ -60,16 +62,33 @@
 			en.feed_date as ey_feed_date,
 			<include refid="org.ulv.timeline.dao.RssFeedDao.feedColumns" />,
 			<include refid="org.ulv.timeline.dao.DistributorDao.distributorCols" />,
+			<include refid="org.ulv.timeline.dao.TimelineDao.timelineCols" />,
 			c.id as cat_id,
-			c.category,
-			${tagAlias}.id as tag_id,
-			${tagAlias}.tag
+			c.category
+	</sql>
+	<sql id="entriesFeedsTimelinesJoins">
 		FROM rss_entries en
 		JOIN rssfeeds f ON f.id = en.rssfeed_id
+		LEFT JOIN timeline_articles tla ON tla.article_id = en.id
+		LEFT JOIN timelines tl ON tl.id = tla.timeline_id
+	</sql>
+	<sql id="basicEntrySelect">
+		<include refid="entrySelectWithoutTags" />,
+			${tagAlias}.id as tag_id,
+			${tagAlias}.tag
+		<include refid="entriesFeedsTimelinesJoins" />
+		<include refid="org.ulv.timeline.dao.RssFeedDao.distributorJoins" />
+	</sql>
+	
+	<sql id="entrySelect">
+		<include refid="basicEntrySelect" />
 		LEFT JOIN categories c ON c.id = en.category_id
 		LEFT JOIN entry_tags et ON et.entry_id = en.id
 		LEFT JOIN tags t ON t.id = et.tag_id
-		<include refid="org.ulv.timeline.dao.RssFeedDao.distributorJoins" />
+	</sql>
+	<sql id="acceptedEntrySelect">
+		<include refid="basicEntrySelect"><property name="tagAlias" value="t"/></include>
+		JOIN categories c ON c.id = en.category_id
 	</sql>
 	
 	<select id="getRssDraftEntry" parameterType="RssEntry" resultMap="rssDraftEntryMap">
@@ -79,13 +98,32 @@
 	</select>
 	
 	<select id="getRssEntry" parameterType="RssEntry" resultMap="rssEntryMap">
-		<include refid="entrySelect"><property name="tagAlias" value="t"/></include>
-		<trim prefix="WHERE">
-			<if test="rssFeed.id != null"> en.rssfeed_id = #{rssFeed.id}</if>
+		<include refid="entrySelect"/>
+		<trim prefix="WHERE" prefixOverrides="AND ">
+			<if test="rssFeed.id != null"> AND en.rssfeed_id = #{rssFeed.id}</if>
+			<if test="tags.size > 0"> AND t.id IN 
+				<foreach collection="tags" item="tag" separator="," open="(" close=")">
+					#{tag.id}
+				</foreach>
+			</if>
 		</trim>
-		ORDER BY en.created_date, c.id
-		LIMIT 20
+		ORDER BY category_id DESC, en.created_date, c.id
+		<if test="limit != null">LIMIT ${limit}</if>
 	</select>
+	
+	<select id="getRssEntryByTags" parameterType="RssEntry" resultMap="rssEntryMap">
+		<include refid="entrySelectWithoutTags" />,
+			null as tag_id
+		<include refid="entriesFeedsTimelinesJoins" />
+		JOIN categories c ON c.id = en.category_id
+		<include refid="org.ulv.timeline.dao.RssFeedDao.distributorJoins" />
+		<foreach collection="tags" item="tag" index="idx">
+			JOIN entry_tags et${idx} ON et${idx}.entry_id = en.id AND et${idx}.tag_id = #{tag.id}
+		</foreach>
+		ORDER BY category_id DESC, en.created_date, c.id
+		<if test="limit != null">LIMIT ${limit}</if>
+	</select>
+	
 	
 	<select id="getRssEntryByTagId" resultMap="rssEntryMap">
 		<include refid="entrySelect"><property name="tagAlias" value="t2"/></include>

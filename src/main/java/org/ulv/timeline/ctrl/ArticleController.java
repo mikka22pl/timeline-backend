@@ -2,6 +2,8 @@ package org.ulv.timeline.ctrl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ulv.timeline.config.HeadersUtil;
 import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.Article;
+import org.ulv.timeline.model.Tag;
 import org.ulv.timeline.model.rss.RssEntry;
 import org.ulv.timeline.service.ArticleService;
 import org.ulv.timeline.service.RssFeedService;
@@ -20,6 +23,8 @@ import org.ulv.timeline.service.RssFeedService;
 @RestController
 @RequestMapping("timeline")
 public class ArticleController {
+	
+	private static final Logger log = LoggerFactory.getLogger(ArticleController.class);
 
 	@Autowired
 	private ArticleService articleService;
@@ -32,6 +37,14 @@ public class ArticleController {
 		
 		List<Article> articles = articleService.getArticles();
 		return new ResponseEntity<List<Article>>(articles, HeadersUtil.HEADERS, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/articles/search", method=RequestMethod.POST)
+	public ResponseEntity<List<RssEntry>> searchArticlesByTags(@RequestBody List<Tag> tags) {
+		log.info("--> searchArticlesByTags({})", tags);
+		
+		List<RssEntry> entries = articleService.searchArticles(tags);
+		return new ResponseEntity<List<RssEntry>>(entries, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/articles/{tagId}", method=RequestMethod.GET)

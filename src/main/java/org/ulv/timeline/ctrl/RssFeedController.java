@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +16,37 @@ import org.ulv.timeline.config.HeadersUtil;
 import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.rss.RssEntry;
 import org.ulv.timeline.model.rss.RssFeed;
-import org.ulv.timeline.service.ArticleServiceImpl;
 import org.ulv.timeline.service.RssFeedService;
 
+/**
+ * 
+ * 
+ * POST: /rss/feed/save
+- save feed service
+
+GET: /rss/feed/draft/{feedId}
+- get articles from rss (by feedId) and save as draft entries
+
+GET: /rss/feeds
+- getAll rss feeds
+
+GET: /rss/entries/draft/{feedId}
+- get list of draf entries from feedId
+
+GET: /rss/entries/{feedId}
+- get list of entries from feedId
+
+POST: /rss/entry/accept
+- accept draft entry
+
+POST: /rss/entry/reject
+- reject draft entry
+
+POST: /rss/entry/save
+- update entry
+
+ *
+ */
 @RestController
 @RequestMapping("timeline")
 public class RssFeedController {
@@ -57,10 +84,6 @@ public class RssFeedController {
 		
 		return new ResponseEntity<RssFeed>(rssFeed, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
-	
-	
-	
-	
 
 	@RequestMapping(value="/rss/entries/draft/{feedId}", method=RequestMethod.GET)
 	public ResponseEntity<List<RssEntry>> getDraftEntries(
@@ -84,17 +107,6 @@ public class RssFeedController {
 		return new ResponseEntity<List<RssEntry>>(entries, HeadersUtil.HEADERS, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/rss/entry/done", method=RequestMethod.POST)
-	public ResponseEntity<Integer> doneEntry(
-			@RequestBody RssEntry rssEntry) {
-		
-		rssFeedService.acceptDraftEntry(rssEntry);
-		
-		return new ResponseEntity<Integer>(1, HeadersUtil.HEADERS, HttpStatus.OK);
-	}
-	
-	
-
 	@RequestMapping(value="/rss/entry/accept", method=RequestMethod.POST)
 	public ResponseEntity<RssEntry> acceptDraftEntry(
 			@RequestBody RssEntry entry) {
@@ -129,6 +141,4 @@ public class RssFeedController {
 			return new ResponseEntity<RssEntry>(HeadersUtil.HEADERS, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	
 }

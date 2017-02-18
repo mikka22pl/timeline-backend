@@ -28,6 +28,14 @@
 		<include refid="timelineSelect" />
 	</select>
 	
+	<insert id="addTimeline" parameterType="Timeline">
+		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
+			SELECT currval('timelines_id_seq') as id
+		</selectKey>
+		INSERT INTO timelines (timeline_name, descr)
+		VALUES (#{name}, #{descr})
+	</insert>
+	
 	<insert id="assignArticle" parameterType="AssignedItem">
 		INSERT INTO timeline_articles (timeline_id, article_id)
 		VALUES (#{baseId}, #{assigneeId})

@@ -27,6 +27,7 @@ public class RssEntry extends BaseArticle {
 
 	private final RssFeed rssFeed;
 	private List<Timeline> timelines;
+	private Integer limit;
 
 	public RssEntry() {
 		this(new RssFeed());
@@ -148,6 +149,14 @@ public class RssEntry extends BaseArticle {
 
 	public void setTimelines(List<Timeline> timelines) {
 		this.timelines = timelines;
+	}
+
+	public Integer getLimit() {
+		return limit;
+	}
+
+	public void setLimit(Integer limit) {
+		this.limit = limit;
 	}
 
 }

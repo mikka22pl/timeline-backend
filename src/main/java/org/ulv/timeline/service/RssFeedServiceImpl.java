@@ -3,9 +3,11 @@ package org.ulv.timeline.service;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -155,17 +157,18 @@ public class RssFeedServiceImpl implements RssFeedService {
 				.collect(Collectors.toList());
 		timelineService.assignArticle(timelineIds, entry);
 		
-		entryDao.updateEntry(entry);
+		/*entryDao.updateEntry(entry);
 		try {
 			assignTags(entry);
 		} catch (DuplicateKeyException e) {
 			log.warn("Assigning tags aborted. duplicate key exception.");
-		}
+		}*/
 		
 		return entry;
 	}
 
-	private void assignTags(RssEntry entry) {
+	@Override
+	public Map<String, List<Integer>> assignTags(RssEntry entry) {
 		log.info("--> assignTags()");
 
 		List<Tag> dbTags = tagDao.getEntryTags(entry.getId());
@@ -173,19 +176,22 @@ public class RssFeedServiceImpl implements RssFeedService {
 				.map(Tag::getId)
 				.collect(Collectors.toCollection(HashSet::new));
 		
-		HashSet<Integer> saveIds = entry.getTags().stream()
+		Map<Boolean, List<Integer>> saveIds = entry.getTags().stream()
 				.map(Tag::getId)
-				.filter(id -> !dbTagIds.contains(id))
-				.collect(Collectors.toCollection(HashSet::new));
-		
-		HashSet<Integer> removeIds = dbTagIds.stream()
-				.filter(id -> !saveIds.contains(id))
-				.collect(Collectors.toCollection(HashSet::new));
+				.collect(Collectors.partitioningBy(id -> !dbTagIds.contains(id)));
+	
+		List<Integer> removeIds = dbTagIds.stream()
+			.filter(id -> !saveIds.get(false).contains(id))
+			.collect(Collectors.toList());
 		
 		removeIds.forEach(id -> entryDao.removeTags(new AssignedItem(entry.getId(), id)));
-		if (saveIds.size() > 0) {
+		if (saveIds.get(true).size() > 0) {
 			entryDao.assignTags(entry);
 		}
+		Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
+		map.put("SAVED", saveIds.get(true));
+		map.put("REMOVED", removeIds);
+		return map;
 	}
 
 	private List<RssEntry> pullEntries(Integer feedId) {

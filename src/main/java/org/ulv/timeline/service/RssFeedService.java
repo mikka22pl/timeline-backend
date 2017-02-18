@@ -1,6 +1,7 @@
 package org.ulv.timeline.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.rss.RssEntry;
@@ -28,4 +29,6 @@ public interface RssFeedService {
 	void rejectDraftEntry(RssEntry entry);
 	
 	RssEntry saveEntry(RssEntry entry) throws TimelineException;
+	
+	Map<String, List<Integer>> assignTags(RssEntry entry);
 }

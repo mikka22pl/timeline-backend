@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.ulv.timeline.dao.ArticleDao;
+import org.ulv.timeline.dao.RssEntryDao;
 import org.ulv.timeline.exceptions.TimelineException;
 import org.ulv.timeline.model.Article;
+import org.ulv.timeline.model.Tag;
+import org.ulv.timeline.model.rss.RssEntry;
 
 @Service("articleService")
 public class ArticleServiceImpl implements ArticleService {
@@ -25,12 +28,26 @@ public class ArticleServiceImpl implements ArticleService {
 	
 	@Autowired
 	private TagService tagService;
+	
+	@Autowired
+	private RssEntryDao entryDao;
 
 	@Override
 	public List<Article> getArticles() {
 		return articleDao.getArticles(null);
 	}
 	
+	
+	
+	@Override
+	public List<RssEntry> searchArticles(List<Tag> tags) {
+		log.info("--> searchArticles()");
+		RssEntry entry = new RssEntry();
+		entry.setTags(tags);
+		entry.setLimit(100);
+		return entryDao.getRssEntryByTags(entry);
+	}
+
 	@Override
 	public List<Article> getArticlesByTagId(Integer tagId) {
 		return articleDao.getArticlesByTagId(tagId);

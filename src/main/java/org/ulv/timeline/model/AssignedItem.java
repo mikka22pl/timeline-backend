@@ -9,9 +9,9 @@ public class AssignedItem implements Serializable {
 	private Integer baseId;
 	private Integer assigneeId;
 
-	public AssignedItem() {
-		
-	}
+	
+	
+	public AssignedItem() {}
 	
 	public AssignedItem(Integer baseId, Integer assigneeId) {
 		this.baseId = baseId;

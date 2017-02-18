@@ -31,4 +31,10 @@ public class TimelineServiceImpl implements TimelineService {
 		}
 	}
 
+	@Override
+	public void saveTimeline(Timeline timeline) {
+		if (timeline.isNew()) {
+			timelineDao.addTimeline(timeline);
+		}
+	}
 }

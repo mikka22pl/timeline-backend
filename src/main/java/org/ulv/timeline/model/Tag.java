@@ -12,7 +12,11 @@ public class Tag extends NamedEntity {
 	}
 	
 	public Tag(String name) {
-		super(name);
+		this(null, name);
+	}
+
+	public Tag(Integer id, String name) {
+		super(id, name);
 		this.language = new Language();
 	}
 	
@@ -23,5 +27,14 @@ public class Tag extends NamedEntity {
 	public void setLanguage(Language language) {
 		this.language = language;
 	}
-	
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.getId());
+		builder.append(":");
+		builder.append(super.getName());
+		builder.append(", ");
+		return builder.toString();
+	}
 }

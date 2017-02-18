@@ -26,6 +26,10 @@ public class RssEntryDao {
 		return sqlSession.selectList("org.ulv.timeline.dao.RssEntryDao.getRssEntryByTagId", tagId);
 	}
 	
+	public List<RssEntry> getRssEntryByTags(RssEntry entry) {
+		return sqlSession.selectList("org.ulv.timeline.dao.RssEntryDao.getRssEntryByTags", entry);
+	}
+	
 	public void addDraftEntry(RssEntry entry) {
 		sqlSession.insert("org.ulv.timeline.dao.RssEntryDao.addDraftEntry", entry);
 	}
