@@ -36,8 +36,17 @@ public class RssEntry extends BaseArticle {
 	public RssEntry(RssFeed rssFeed) {
 		this(null, rssFeed);
 	}
+	
+	public RssEntry(Integer id) {
+		this(id, null, new RssFeed());
+	}
 
 	public RssEntry(String title, RssFeed rssFeed) {
+		this(null, title, rssFeed);
+	}
+
+	public RssEntry(Integer id, String title, RssFeed rssFeed) {
+		super(id);
 		this.rssFeed = rssFeed;
 		this.title = title;
 		this.timelines = Lists.newArrayList();

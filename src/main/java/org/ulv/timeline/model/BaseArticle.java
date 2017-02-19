@@ -14,12 +14,12 @@ public class BaseArticle extends NamedEntity {
 
 	public BaseArticle() {
 		this(null);
-		this.category = new Category();
-		this.tags = new ArrayList<Tag>();
 	}
 	
 	public BaseArticle(Integer id) {
 		super(id);
+		this.category = new Category();
+		this.tags = new ArrayList<Tag>();
 	}
 	
 	public Category getCategory() {

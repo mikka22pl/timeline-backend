@@ -81,7 +81,7 @@
 	</sql>
 	
 	<sql id="entrySelect">
-		<include refid="basicEntrySelect" />
+		<include refid="basicEntrySelect"><property name="tagAlias" value="t"/></include>
 		LEFT JOIN categories c ON c.id = en.category_id
 		LEFT JOIN entry_tags et ON et.entry_id = en.id
 		LEFT JOIN tags t ON t.id = et.tag_id
@@ -120,7 +120,7 @@
 		<foreach collection="tags" item="tag" index="idx">
 			JOIN entry_tags et${idx} ON et${idx}.entry_id = en.id AND et${idx}.tag_id = #{tag.id}
 		</foreach>
-		ORDER BY category_id DESC, en.created_date, c.id
+		ORDER BY en.created_date
 		<if test="limit != null">LIMIT ${limit}</if>
 	</select>
 	

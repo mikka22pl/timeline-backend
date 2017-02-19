@@ -3,7 +3,6 @@ package org.ulv.timeline.service;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -151,18 +150,14 @@ public class RssFeedServiceImpl implements RssFeedService {
 		Integer languageId = entry.getRssFeed().getDistributor().getLanguage().getId();
 		List<Integer> tagsIds = tagService.saveTags(entry.getTags(), languageId);
 
-		// TODO: fix it for update case
-		List<Integer> timelineIds = entry.getTimelines().stream()
-				.map(Timeline::getId)
-				.collect(Collectors.toList());
-		timelineService.assignArticle(timelineIds, entry);
+		assignTimelines(entry);
 		
-		/*entryDao.updateEntry(entry);
+		entryDao.updateEntry(entry);
 		try {
 			assignTags(entry);
 		} catch (DuplicateKeyException e) {
 			log.warn("Assigning tags aborted. duplicate key exception.");
-		}*/
+		}
 		
 		return entry;
 	}
@@ -187,6 +182,33 @@ public class RssFeedServiceImpl implements RssFeedService {
 		removeIds.forEach(id -> entryDao.removeTags(new AssignedItem(entry.getId(), id)));
 		if (saveIds.get(true).size() > 0) {
 			entryDao.assignTags(entry);
+		}
+		Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
+		map.put("SAVED", saveIds.get(true));
+		map.put("REMOVED", removeIds);
+		return map;
+	}
+
+	@Override
+	public Map<String, List<Integer>> assignTimelines(RssEntry entry) {
+		log.info("--> assignTimelines()");
+		
+		List<Timeline> dbTimelines = timelineService.getEntryTimelines(entry.getId());
+		HashSet<Integer> dbTimelineIds = dbTimelines.stream()
+				.map(Timeline::getId)
+				.collect(Collectors.toCollection(HashSet::new));
+		
+		Map<Boolean, List<Integer>> saveIds = entry.getTimelines().stream()
+				.map(Timeline::getId)
+				.collect(Collectors.partitioningBy(id -> !dbTimelineIds.contains(id)));
+		
+		List<Integer> removeIds = dbTimelineIds.stream()
+				.filter(id -> !saveIds.get(false).contains(id))
+				.collect(Collectors.toList());
+		
+		removeIds.forEach(id -> timelineService.removeTimeline(new AssignedItem(entry.getId(), id)));
+		if (saveIds.get(true).size() > 0) {
+			timelineService.assignArticle(saveIds.get(true), entry);
 		}
 		Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
 		map.put("SAVED", saveIds.get(true));

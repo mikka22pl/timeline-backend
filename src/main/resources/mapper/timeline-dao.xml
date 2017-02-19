@@ -23,9 +23,18 @@
 			<include refid="timelineCols" />
 		FROM timelines tl
 	</sql>
+	<sql id="entriesJoin">
+		LEFT JOIN timeline_articles ta ON tl.id = ta.timeline_id
+	</sql>
 	
-	<select id="getTimeline" resultMap="timelineMap">
+	<select id="getTimeline" parameterType="RssEntry" resultMap="timelineMap">
 		<include refid="timelineSelect" />
+		<if test="id != null">
+			<include refid="entriesJoin" />
+		</if>
+		<trim prefix="WHERE">
+			<if test="id != null"> ta.article_id = #{id}</if>
+		</trim>
 	</select>
 	
 	<insert id="addTimeline" parameterType="Timeline">
@@ -40,5 +49,9 @@
 		INSERT INTO timeline_articles (timeline_id, article_id)
 		VALUES (#{baseId}, #{assigneeId})
 	</insert>
+	
+	<delete id="removeTimeline" parameterType="AssignedItem">
+		DELETE FROM timeline_articles WHERE article_id = #{baseId} AND timeline_id = #{assigneeId}
+	</delete>
 
 </mapper>
