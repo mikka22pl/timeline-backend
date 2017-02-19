@@ -31,4 +31,5 @@ public interface RssFeedService {
 	RssEntry saveEntry(RssEntry entry) throws TimelineException;
 	
 	Map<String, List<Integer>> assignTags(RssEntry entry);
+	Map<String, List<Integer>> assignTimelines(RssEntry entry);
 }

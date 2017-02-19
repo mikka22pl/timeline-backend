@@ -2,6 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.ulv.timeline.dao.TagDao">
 	
+	<cache eviction="FIFO" />
+	
 	<resultMap id="tagMap" type="Tag">
 		<id     property="id"       column="tag_id" />
 		<result property="name" 	column="tag" />
@@ -23,12 +25,12 @@
 		JOIN languages l ON l.id = t.language_id
 	</sql>
 	
-	<select id="getTag" parameterType="integer" resultMap="tagMap">
+	<select id="getTag" parameterType="integer" resultMap="tagMap" useCache="true">
 		<include refid="tagSelect" />
 		WHERE t.language_id = #{value}
 	</select>
 	
-	<select id="getTagByName" resultMap="tagMap" parameterType="Tag">
+	<select id="getTagByName" resultMap="tagMap" parameterType="Tag" useCache="true">
 		<include refid="tagSelect" />
 		WHERE t.language_id = #{language.id}
 		AND LOWER(t.tag) = LOWER(#{name})
@@ -40,7 +42,7 @@
 		WHERE et.entry_id = #{value}
 	</select>
 	
-	<insert id="addTag" parameterType="Tag">
+	<insert id="addTag" parameterType="Tag" flushCache="true">
 		<selectKey keyProperty="id" keyColumn="id" order="AFTER" resultType="integer">
 			SELECT currval('tags_id_seq') as id
 		</selectKey>

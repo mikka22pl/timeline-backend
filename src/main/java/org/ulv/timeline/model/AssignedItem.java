@@ -33,4 +33,15 @@ public class AssignedItem implements Serializable {
 	public void setAssigneeId(Integer assigneeId) {
 		this.assigneeId = assigneeId;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("AssignedItem [baseId=");
+		builder.append(baseId);
+		builder.append(", assigneeId=");
+		builder.append(assigneeId);
+		builder.append("]");
+		return builder.toString();
+	}
 }
